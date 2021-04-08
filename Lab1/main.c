@@ -1,4 +1,6 @@
 /******************************************************************
+ * SOURCES ;
+ * 
  * Author 1: Adrian Statescu mergesortv@gmail.com http://adrianstatescu.com
  * Description: C Program to compute PI using a Monte Carlo Method.
  * MIT license
@@ -26,16 +28,18 @@ double getRand(unsigned int *seed) {
 
 /* For both Sequential and Parallel functions, 
  * I used Adrian Statescu monte carlo's algorithm, 
- * but followed mrigankdoshy for better naming.*/
+ * but followed mrigankdoshy for better naming strategy.*/
 
+/**************************************************************************************/
 long double Calculate_Pi_Sequential(long long number_of_tosses) {
+    
+    //variable numberInCircle keeps count of randomly generated points that fall in circle
     long long numberInCircle = 0;
     unsigned int seed = (unsigned int) time(NULL);
-    
 
-    
+    //loop schedule validates random points (x,y) if they are within the circle 
     for (long long int i = 0; i < number_of_tosses; i++) {
-        double x = getRand(&seed);
+        double x = getRand(&seed);                          
         double y = getRand(&seed);
         double distanceSquared = x*x + y*y;
         
@@ -49,31 +53,38 @@ long double Calculate_Pi_Sequential(long long number_of_tosses) {
   return pi;
 }
 
+/*****************************************************************************************/
 long double Calculate_Pi_Parallel(long long number_of_tosses) {
+     
+     //variable numberInCircle keeps count of randomly generated points that fall in circle
      long long numberInCircle = 0;
-#pragma omp parallel num_threads(omp_get_max_threads())
-    {
+
+    //this directive specifies the number of threads to execute
+    #pragma omp parallel num_threads(omp_get_max_threads())
+        {
         unsigned int seed = (unsigned int) time(NULL) + (unsigned int) omp_get_thread_num();
         
+        //cummulative count of validated points (those in circle) from different threads is summed up
         #pragma omp for reduction(+: numberInCircle)
         
-
-    
-    for (long long int i = 0; i < number_of_tosses; i++) {
-        double x = getRand(&seed);
-        double y = getRand(&seed);
-        double distanceSquared = x*x + y*y;
+        //loop schedule validates random points (x,y) if they are within the circle
+            for (long long int i = 0; i < number_of_tosses; i++) {
+                double x = getRand(&seed);
+                double y = getRand(&seed);
+                double distanceSquared = x*x + y*y;
         
-        if (distanceSquared <= 1) 
-        	numberInCircle++;
-      }
-    }
+                if (distanceSquared <= 1) 
+        	    numberInCircle++;
+            }
+        }
+
     double pi = (double) numberInCircle / number_of_tosses * 4;
  
     printf("Approximate PI = %g", pi);
 
     return pi;
 }
+/*******************************************************************************************/
 
 int main() {
     struct timeval start, end;
