@@ -4,6 +4,9 @@
 #include <time.h>
 #include <sys/time.h>
 
+/*Main source for Lab2: An Introduction to Parallel Programming
+ *Author: Peter Pacheco*/
+
 static const long Num_To_Add = 1000000000;
 static const double Scale = 10.0 / RAND_MAX;
 
@@ -15,10 +18,18 @@ long add_serial(const char *numbers) {
     return sum;
 }
 
+//Copied the logic from add_serial function
 long add_parallel(const char *numbers) {
     long sum = 0;
-    #pragma omp parallel for reduction (+:sum)
+    /*Used concept from Lab1.
+    * The directive forks threads to carry out task*/
+    #pragma omp parallel for 
     for (long i = 0; i < Num_To_Add; i++) {
+        /*This directive specifies that code will be executed by one thread at a time
+         *I got idea from a different project on github
+         *Github source: https://github.com/ujeshmaurya/Concurrent_Parallel_Programming/blob/master/WEEK_8_OpenMP/omp14.c
+         *Author: ujeshmaurya*/
+        #pragma omp critical
         sum += numbers[i];
     }
     return sum;
