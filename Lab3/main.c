@@ -20,6 +20,7 @@ static const long double Zoom = 2;
 
 // We use the coloring schema outlined from https://solarianprogrammer.com/2013/02/28/mandelbrot-set-cpp-11/
 void calc_colors(RGB_Pixel *colors) {
+    //borrowed the pragma idea from lab1 and lab2
     #pragma omp parallel for
     for (int i = 0; i < Max_Iterations; i++) {
         double t = (double) i / Max_Iterations;
@@ -65,6 +66,8 @@ int main(int argc, const char **argv) {
     };
 
     // Loop through the image pixels
+    /*The use of collapse clause came from this article: 
+     *https://nanxiao.gitbooks.io/openmp-little-book/content/posts/collapse-clause.html*/
     #pragma omp parallel for collapse(2)
     for (int img_y = 0; img_y < Image_Height; img_y++) {
         for (int img_x = 0; img_x < Image_Width; img_x++) {
@@ -108,6 +111,8 @@ int main(int argc, const char **argv) {
 
     free(pixels);
     //free(colors);
+
+    //time stamping idea borrowed from lab1
      gettimeofday(&end, NULL);
     printf("Took %f seconds after parallelizing\n\n", end.tv_sec - start.tv_sec + (double) (end.tv_usec - start.tv_usec) / 1000000);
     return 0;
